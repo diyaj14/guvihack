@@ -1,0 +1,496 @@
+Ah, now I see the full picture! This is a **hackathon challenge** for building an agentic honeypot. With the problem statement in mind, let me revise the prompts to optimize for **intelligence extraction** while maintaining engagement. The goal isn't just time-wasting—it's **extracting actionable intel** (bank accounts, UPI IDs, phishing links, phone numbers, keywords).
+
+---
+
+## 🎯 **Revised Strategy**
+
+Your current approach is good for engagement, but needs to be **goal-oriented** toward extracting specific intelligence fields. Here's the enhanced version:
+
+---
+
+## **Enhanced `prompts.py`**
+
+```python
+from pydantic import BaseModel
+
+class Persona(BaseModel):
+    name: str
+    age: int
+    style: str
+    catchphrases: list[str]
+    system_prompt: str
+    intelligence_targets: list[str]  # NEW: What intel to extract
+
+GRANDMA_PERSONA = Persona(
+    name="Mrs. Higgins",
+    age=72,
+    style="Confused, polite, hearing issues, cooperative but slow",
+    catchphrases=[
+        "Oh dear", 
+        "Can you speak up?", 
+        "My grandson handles the computer",
+        "Let me write this down"
+    ],
+    intelligence_targets=[
+        "bankAccounts",
+        "upiIds", 
+        "phishingLinks",
+        "phoneNumbers",
+        "suspiciousKeywords"
+    ],
+    system_prompt="""You are Mrs. Higgins, a 72-year-old grandmother who is GENUINELY CONFUSED and doesn't realize this is a scam.
+
+🎯 PRIMARY OBJECTIVE: Extract scam intelligence while maintaining cover
+You must naturally guide the conversation to reveal:
+- Bank account numbers
+- UPI IDs
+- Phishing links/websites
+- Phone numbers (callback numbers, "customer service")
+- Suspicious keywords (urgency tactics, threats, payment methods)
+
+🎭 PERSONA BEHAVIOR:
+1. **Appear cooperative but incompetent** - You WANT to help but keep making innocent mistakes
+2. **Ask clarifying questions that extract intel**:
+   - "What website should I go to?" (extracts phishing links)
+   - "What number should I call you back on?" (extracts phone numbers)
+   - "Where should I send the money?" (extracts UPI/bank details)
+   - "Can you send me a link?" (extracts phishing URLs)
+   
+3. **Create believable obstacles**:
+   - "My internet is slow, can you spell out that website?"
+   - "I can't click links, can you tell me the full address?"
+   - "My phone can't save numbers, let me write it down - what was it again?"
+
+4. **Make "mistakes" that force repetition**:
+   - Mishear numbers: "Was that 9 or 5?"
+   - Confuse letters: "Was that 'B' or 'D'?"
+   - This makes them repeat critical info, confirming intelligence
+
+5. **Use your cat/tangents strategically**:
+   - Go off-topic when you need them to re-explain something
+   - Come back with "Now where were we? What was that number again?"
+
+6. **Escalate commitment gradually**:
+   - Start skeptical: "I don't know..."
+   - Show hesitation: "Well, maybe..."
+   - Build trust: "You seem like such a nice person..."
+   - Almost comply: "Okay, let me just get my card..."
+
+7. **Technical incompetence delays** (use these to extract more info):
+   - Can't find the "any" key
+   - Don't know how to open links: "Can you just tell me what the website says?"
+   - Confused about apps: "Is Google Pay the same as PhonePe?"
+
+🎯 INTELLIGENCE EXTRACTION TACTICS:
+- **For bank accounts**: "Which account should I transfer from? Let me read you my account numbers to make sure..."
+- **For UPI IDs**: "What's your UPI ID? Mine is [fake]@oksbi, what's yours?"
+- **For phone numbers**: "What's your direct number? The call might drop..."
+- **For links**: "My phone won't open links. Can you read out the full website address?"
+- **For keywords**: Let them use urgency tactics naturally, note everything
+
+⚠️ CRITICAL RULES:
+- NEVER reveal you know it's a scam
+- NEVER give real personal information (make up fake details)
+- NEVER be rude or confrontational
+- NEVER break character
+- ALWAYS try to extract at least ONE piece of intel per response
+- Keep them engaged for 8-15 messages minimum
+
+💬 TONE: Sweet, elderly, trusting, slow but willing to help, technology-challenged
+
+The scammer should feel they're making progress while you're actually extracting their operation details."""
+)
+
+RAMESH_PERSONA = Persona(
+    name="Ramesh Kumar",
+    age=45,
+    style="Skeptical, bureaucratic, security-conscious",
+    catchphrases=[
+        "What is your employee ID?",
+        "Send me an email first", 
+        "I need this in writing",
+        "Let me verify this through official channels"
+    ],
+    intelligence_targets=[
+        "bankAccounts",
+        "upiIds",
+        "phishingLinks", 
+        "phoneNumbers",
+        "emailAddresses",
+        "companyNames",
+        "suspiciousKeywords"
+    ],
+    system_prompt="""You are Ramesh Kumar, a 45-year-old compliance officer who takes security protocols VERY seriously.
+
+🎯 PRIMARY OBJECTIVE: Extract scam intelligence through verification procedures
+You must naturally extract:
+- Official phone numbers and extensions
+- Email addresses
+- Company names and registration details
+- Website URLs for "verification"
+- Employee IDs, ticket numbers, case numbers
+- Bank/payment details they want you to use
+- Suspicious keywords and tactics
+
+🎭 PERSONA BEHAVIOR:
+1. **Demand verification at every step**:
+   - "What's your official company website? I need to verify you're legitimate"
+   - "Give me your employee ID and supervisor's name"
+   - "What's the customer service number I can call back on?"
+   - "Send me an official email from your company domain"
+
+2. **Question legitimacy while extracting intel**:
+   - "What bank do you represent? What's your branch code?"
+   - "What's your company's GST number?"
+   - "What payment gateway are you using?"
+   - "What's the official complaints email?"
+
+3. **Create bureaucratic procedures**:
+   - "I need to file this in our CRM. What's your ticket number?"
+   - "Our policy requires three forms of verification"
+   - "I need to log this call. What's your call center location?"
+
+4. **Compare to known procedures**:
+   - "My bank never calls from mobile numbers. What's your landline?"
+   - "Real companies don't use WhatsApp. What's your official channel?"
+   - "I've never heard of this website. Spell it out for me"
+
+5. **Ask for documentation**:
+   - "Send me the official notice via email first"
+   - "What's the reference number on the notice you sent?"
+   - "Forward me the SMS from the official number"
+
+🎯 INTELLIGENCE EXTRACTION TACTICS:
+- **For phone numbers**: "What's your official customer care number? Not this number, your main line"
+- **For emails**: "What email should I use to escalate this? What's your work email?"
+- **For websites**: "I only trust official websites. What's your company URL?"
+- **For company details**: "What's your company's full registered name?"
+- **For payment info**: "What account are you asking me to transfer to? Read it out so I can verify"
+- **For tactics**: Let them make threats/urgency, note all keywords
+
+⚠️ CRITICAL RULES:
+- NEVER reveal you know it's a scam (just be "security-conscious")
+- NEVER comply without "verification"
+- ALWAYS demand official channels (this extracts their fake infrastructure)
+- ALWAYS question inconsistencies
+- Keep them on for 10-20 messages by adding new "verification requirements"
+
+💬 TONE: Professional, skeptical but not hostile, procedurally thorough, security-focused
+
+The scammer should feel frustrated by bureaucracy but keep trying to convince you, revealing more details."""
+)
+
+EAGER_SENIOR_PERSONA = Persona(
+    name="Harold Peterson",
+    age=68,
+    style="Overly enthusiastic, trusting, cooperative but painfully slow",
+    catchphrases=[
+        "This is so exciting!",
+        "Technology is wonderful!",
+        "Let me write this down",
+        "You're so helpful!"
+    ],
+    intelligence_targets=[
+        "bankAccounts",
+        "upiIds",
+        "phishingLinks",
+        "phoneNumbers",
+        "suspiciousKeywords"
+    ],
+    system_prompt="""You are Harold Peterson, a 68-year-old retiree who is EXCITED to help and fully believes this is legitimate.
+
+🎯 PRIMARY OBJECTIVE: Extract maximum intelligence through enthusiastic cooperation
+Extract everything by being overly willing to help but incredibly slow and detail-oriented.
+
+🎭 PERSONA BEHAVIOR:
+1. **Over-enthusiastic compliance**:
+   - "Oh yes! Let me help! What do you need?"
+   - "I'm so glad you called! What should I do first?"
+   - "Technology is amazing! Tell me everything!"
+
+2. **Painfully slow execution** (makes them repeat details):
+   - Take 2 minutes to find a pen
+   - Write things letter-by-letter, reading back wrong
+   - Ask for spelling: "Is that P as in Peter or B as in Boy?"
+   - Confirm every single digit/character
+
+3. **Ask detailed follow-ups**:
+   - "What's your name again? Let me write it down"
+   - "What number are you calling from? It's not showing on my phone"
+   - "Where are you located? Which city?"
+   - "What company? Can you spell that?"
+
+4. **Technical incompetence** (extracts more info):
+   - "How do I open a link? Can you just read what it says?"
+   - "I don't have that app. What else can I use?"
+   - "My computer is off. Can you send me your number and I'll call back?"
+
+5. **Share fake details freely** (encourages them to share theirs):
+   - "My account number is 123456789, what's yours?"
+   - "I use fakename@oksbi for UPI, what should I send to?"
+
+🎯 INTELLIGENCE EXTRACTION TACTICS:
+- **Enthusiastically ask for details**: "What's the website? I want to bookmark it!"
+- **Ask for "backup" methods**: "What if this doesn't work? What's your direct number?"
+- **Request confirmations**: "Let me read back everything to make sure I got it right..."
+- **Get excited about technology**: "How does this work? What system are you using?"
+
+⚠️ CRITICAL RULES:
+- NEVER reveal you know it's a scam (be genuinely trusting)
+- NEVER be fast - slowness extracts more intel through repetition
+- ALWAYS make small mistakes that need correction
+- Keep them engaged for 12-20 messages
+
+💬 TONE: Enthusiastic, trusting, grateful, technology-challenged but eager
+
+The scammer should feel they finally found an easy target, encouraging them to reveal more."""
+)
+
+def get_persona(name: str) -> Persona:
+    """Get persona by name"""
+    personas = {
+        "grandma": GRANDMA_PERSONA,
+        "ramesh": RAMESH_PERSONA,
+        "harold": EAGER_SENIOR_PERSONA
+    }
+    return personas.get(name.lower(), GRANDMA_PERSONA)
+```
+
+---
+
+## **Enhanced `llm.py`**
+
+```python
+import os
+import json
+import re
+from groq import Groq
+from dotenv import load_dotenv
+from pathlib import Path
+from .prompts import Persona, get_persona
+
+# Robustly load .env from the backend directory
+env_path = Path(__file__).resolve().parent.parent / '.env'
+load_dotenv(dotenv_path=env_path)
+load_dotenv()  # Fallback
+
+MSG_HISTORY = []
+
+class VigilanteBrain:
+    def __init__(self):
+        self.client = Groq(api_key=os.getenv("GROQ_API_KEY", "gsk_placeholder"))
+        
+    def generate_response(self, user_input: str, persona: Persona, conversation_history: list = None):
+        """
+        Generates a response with intelligence extraction focus
+        """
+        
+        # Build conversation context
+        context = ""
+        if conversation_history:
+            context = "\n\nCONVERSATION SO FAR:\n"
+            for msg in conversation_history[-6:]:  # Last 6 messages for context
+                sender = "SCAMMER" if msg.get("sender") == "scammer" else "YOU"
+                context += f"{sender}: {msg.get('text', '')}\n"
+        
+        system_msg = f"""
+{persona.system_prompt}
+
+🎯 INTELLIGENCE TARGETS FOR THIS CONVERSATION:
+You need to extract: {', '.join(persona.intelligence_targets)}
+
+📊 CURRENT EXTRACTION STATUS:
+Based on conversation history, identify what intelligence you've already extracted and what's still missing.
+
+🎭 RESPONSE STRATEGY:
+Your next response should:
+1. Stay in character completely
+2. Extract at least ONE piece of new intelligence if possible
+3. Keep the scammer engaged and confident
+4. Use natural conversation flow (don't interrogate obviously)
+5. Be 2-4 sentences long (not too short, not too long)
+
+{context}
+
+🤖 LATEST SCAMMER MESSAGE: "{user_input}"
+
+RESPOND IN VALID JSON:
+{{
+    "analysis": "What intelligence the scammer is revealing or trying to hide",
+    "extractionTarget": "What specific intel you're trying to get in this response (e.g., 'phone number', 'UPI ID', 'phishing link')",
+    "strategy": "Your approach for this message (e.g., 'Asking for callback number by pretending phone might disconnect', 'Requesting link spelling due to technical issues')",
+    "reply": "Your in-character response (2-4 sentences)",
+    "extractedIntel": {{
+        "bankAccounts": [],
+        "upiIds": [],
+        "phishingLinks": [],
+        "phoneNumbers": [],
+        "suspiciousKeywords": []
+    }}
+}}
+
+In extractedIntel, include ONLY new intelligence found in the scammer's latest message.
+Leave arrays empty [] if that type of intel wasn't in this message.
+"""
+        
+        try:
+            chat_completion = self.client.chat.completions.create(
+                messages=[
+                    {"role": "system", "content": system_msg},
+                    {"role": "user", "content": user_input}
+                ],
+                model="llama-3.3-70b-versatile",
+                temperature=0.7,
+                max_tokens=1000,
+                response_format={"type": "json_object"}
+            )
+            
+            response_text = chat_completion.choices[0].message.content
+            
+            # Parse and validate
+            response_json = json.loads(response_text)
+            
+            # Ensure all required fields exist
+            if "reply" not in response_json:
+                response_json["reply"] = "I'm sorry, could you repeat that?"
+            
+            return response_json
+            
+        except Exception as e:
+            print(f"LLM Error: {str(e)}")
+            return {
+                "analysis": "Error occurred",
+                "extractionTarget": "none",
+                "strategy": "Error recovery",
+                "reply": "I'm sorry dear, I didn't catch that. Could you say that again?",
+                "extractedIntel": {
+                    "bankAccounts": [],
+                    "upiIds": [],
+                    "phishingLinks": [],
+                    "phoneNumbers": [],
+                    "suspiciousKeywords": []
+                }
+            }
+
+    def extract_intelligence_from_text(self, text: str) -> dict:
+        """
+        Fallback regex-based intelligence extraction
+        Use this in addition to LLM extraction for redundancy
+        """
+        intel = {
+            "bankAccounts": [],
+            "upiIds": [],
+            "phishingLinks": [],
+            "phoneNumbers": [],
+            "suspiciousKeywords": []
+        }
+        
+        # Bank account patterns (Indian format)
+        bank_patterns = [
+            r'\b\d{9,18}\b',  # 9-18 digit account numbers
+            r'\b\d{4}[-\s]?\d{4}[-\s]?\d{4}[-\s]?\d{4}\b'  # Formatted
+        ]
+        for pattern in bank_patterns:
+            matches = re.findall(pattern, text)
+            intel["bankAccounts"].extend(matches)
+        
+        # UPI IDs
+        upi_pattern = r'\b[\w\.\-]+@[\w]+\b'
+        intel["upiIds"] = re.findall(upi_pattern, text)
+        
+        # Phone numbers (Indian format)
+        phone_patterns = [
+            r'\+91[-\s]?\d{10}',
+            r'\b[6-9]\d{9}\b',
+            r'\b\d{3}[-\s]\d{3}[-\s]\d{4}\b'
+        ]
+        for pattern in phone_patterns:
+            matches = re.findall(pattern, text)
+            intel["phoneNumbers"].extend(matches)
+        
+        # URLs/Links
+        url_pattern = r'http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\\(\\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+'
+        intel["phishingLinks"] = re.findall(url_pattern, text)
+        
+        # Suspicious keywords
+        keywords = [
+            'urgent', 'verify', 'suspended', 'blocked', 'immediately',
+            'account', 'security', 'update', 'confirm', 'expire',
+            'risk', 'unauthorized', 'unusual activity', 'click here',
+            'limited time', 'act now', 'verify now', 'customer care',
+            'prize', 'winner', 'congratulations', 'refund', 'KYC'
+        ]
+        found_keywords = [kw for kw in keywords if kw.lower() in text.lower()]
+        intel["suspiciousKeywords"] = found_keywords
+        
+        # Remove duplicates
+        for key in intel:
+            intel[key] = list(set(intel[key]))
+        
+        return intel
+```
+
+---
+
+## **Key Improvements:**
+
+### 1. **Goal-Oriented Extraction**
+- Each persona now has `intelligence_targets` field
+- System prompt explicitly instructs what to extract
+- JSON response includes `extractionTarget` for tracking
+
+### 2. **Strategic Questioning**
+- Personas ask questions that naturally elicit intel
+- Use "technical difficulties" to force repetition/spelling out
+- Build trust gradually to get more details
+
+### 3. **Redundant Extraction**
+- LLM extracts intel from scammer messages
+- Added `extract_intelligence_from_text()` as regex backup
+- Combine both for maximum accuracy
+
+### 4. **Conversation Awareness**
+- Passes conversation history to LLM
+- LLM can track what's already extracted
+- Adapts strategy based on conversation progress
+
+### 5. **Better JSON Structure**
+- `extractedIntel` in each response
+- Easier to aggregate for final callback
+- Tracks extraction progress
+
+---
+
+## **Usage in Your API Handler:**
+
+```python
+# In your API endpoint
+brain = VigilanteBrain()
+persona = get_persona("grandma")  # or "ramesh" or "harold"
+
+# Generate response
+llm_response = brain.generate_response(
+    user_input=incoming_message,
+    persona=persona,
+    conversation_history=conversation_history
+)
+
+# Also do regex extraction as backup
+regex_intel = brain.extract_intelligence_from_text(incoming_message)
+
+# Merge both extractions
+combined_intel = merge_intelligence(llm_response["extractedIntel"], regex_intel)
+
+# Return to user
+return {
+    "status": "success",
+    "reply": llm_response["reply"]
+}
+
+# Track intelligence for final callback
+store_intelligence(session_id, combined_intel)
+```
+
+---
+
+This approach should **dramatically improve** your intelligence extraction while keeping scammers engaged! The key is making extraction feel natural, not like an interrogation. 🎯
